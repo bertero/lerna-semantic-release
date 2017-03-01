@@ -76,20 +76,6 @@ function createChangelog (done) {
     releaseCount: 0
   }, {
     repoUrl: typeof rootPackageRepository !== 'object' ? rootPackageRepository : rootPackageRepository.url
-  }, {}, {}, {
-    finalizeContext: function (context) {
-      const tagParts = tagging.getTagParts(context.version);
-      if (!tagParts) {
-        return context;
-      }
-      context.version = tagging.lerna(tagParts.name, tagParts.version);
-      context.gitSemverTags = context.gitSemverTags.map(function (gitSemverTag) {
-        const tagParts = tagging.getTagParts(gitSemverTag);
-        const transformedTag = tagParts ? tagging.lerna(tagParts.name, tagParts.version) : gitSemverTag;
-        return transformedTag;
-      });
-      return context;
-    }
   }).pipe(writeStream);
 
   stream.on('close', function () {
