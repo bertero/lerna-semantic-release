@@ -95,6 +95,26 @@ describe('findAffectsLine: ', function () {
     var commit = {message: "chore(component): add packages\n"};
     expect(analyzeCommits.findAffectsLine(commit)).to.equal(undefined);
   });
+
+  it('concatenates when the line is separated by a single newline char', function () {
+    var commit = {message: "feat(component): add packages\n\naffects: a, b,\nc, d"}
+    expect(analyzeCommits.findAffectsLine(commit)).to.equal('affects: a, b, c, d');
+  });
+
+  it('concatenates when the line is separated by a multiple newline chars', function () {
+    var commit = {message: "feat(component): add packages\n\naffects: a, b,\n\n\nc, d,\ne"}
+    expect(analyzeCommits.findAffectsLine(commit)).to.equal('affects: a, b, c, d, e');
+  });
+
+  it('concatenates until the last affected pacakge', function () {
+    var commit = {message: "feat(component): add packages\n\naffects: a, b,\n\n\nc, d,\ne\nfoobarbaz"}
+    expect(analyzeCommits.findAffectsLine(commit)).to.equal('affects: a, b, c, d, e');
+  });
+
+  it('doesnt concatenate if the affects line doesnt end in a comma', function () {
+    var commit = {message: "feat(component): add packages\n\naffects: a\n\n\nc, d,\ne\nfoobarbaz"}
+    expect(analyzeCommits.findAffectsLine(commit)).to.equal('affects: a');
+  });
 });
 
 describe('getting affected packages:', function () {
