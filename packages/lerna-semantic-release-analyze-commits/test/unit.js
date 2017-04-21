@@ -112,8 +112,18 @@ describe('findAffectsLine: ', function () {
   });
 
   it('doesnt concatenate if the affects line doesnt end in a comma', function () {
-    var commit = {message: "feat(component): add packages\n\naffects: a\n\n\nc, d,\ne\nfoobarbaz"}
-    expect(analyzeCommits.findAffectsLine(commit)).to.equal('affects: a');
+    var commit = {message: `feat(component): DO NOT MERGE THIS
+
+affects: aaaaaaaaaaa, bbbbbbbbbbb, ccccccccccc, ddddddddddd, eeeeeeeeeee,
+fffffffffff, ggggggggggg, hhhhhhhhhhh, iiiiiiiiiii, jjjjjjjjjjj,
+
+kkkkkkkkkkk, lllllllllll, mmmmmmmmmmm, nnnnnnnnnnn, ooooooooooo
+
+SERIOUSLY, DO NOT MERGE THIS`}
+
+    expect(analyzeCommits.findAffectsLine(commit)).to.equal('affects: aaaaaaaaaaa, bbbbbbbbbbb, ccccccccccc, '
+      + 'ddddddddddd, eeeeeeeeeee, fffffffffff, ggggggggggg, hhhhhhhhhhh, iiiiiiiiiii, '
+      + 'jjjjjjjjjjj, kkkkkkkkkkk, lllllllllll, mmmmmmmmmmm, nnnnnnnnnnn, ooooooooooo');
   });
 });
 

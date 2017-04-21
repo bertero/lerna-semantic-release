@@ -53,20 +53,14 @@ module.exports = {
         return affects;
       }
 
-      if (affects.message.length > 0) {
+      if (
+        affects.message.length > 0 || currentMessageLine.indexOf(affectsDelimiter) === 0
+      ) {
         if (currentMessageLine[currentMessageLine.length - 1] !== ',') {
           affects.done = true;
         }
 
-        affects.message += ' ' + currentMessageLine;
-        return affects;
-      }
-
-      if (currentMessageLine.indexOf(affectsDelimiter) === 0) {
-        affects.message = currentMessageLine;
-        if (currentMessageLine[currentMessageLine.length - 1] !== ',') {
-          affects.done = true;
-        }
+        affects.message += currentMessageLine + ' ';
         return affects;
       }
 
@@ -77,7 +71,8 @@ module.exports = {
       .message
       .split('\n')
       .reduce(reducer, { message: '', done: false })
-      .message;
+      .message
+      .trim();
 
     return affectsLine;
   },
