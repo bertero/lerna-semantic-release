@@ -3,7 +3,76 @@ var expect = require('expect.js');
 var perform = require('../index');
 
 describe('perform', function() {
-  describe('with three pakcages set up', function () {
+  describe('when cli flags has --dont-pull', function () {
+    beforeEach(function () {
+      var fsState = {
+        'packages': {
+          'a': {
+            'index.js': 'Modified',
+            'package.json': JSON.stringify({name: 'a', version: '0.0.1'})
+          },
+          'b': {
+            'index.js': 'Modified',
+            'package.json': JSON.stringify({name: 'b', version: '0.0.1'})
+          },
+          'c': {
+            'index.js': 'Unmodified',
+            'package.json': JSON.stringify({name: 'c', version: '0.0.0'})
+          }
+        },
+        'package.json': JSON.stringify({name: 'main', version: '0.0.0'}),
+        'lerna.json': JSON.stringify({lerna: '2.0.0-beta.17', version: 'independent'})
+      };
+
+      io.mock({
+        fs: fsState,
+        git: {
+          allTags: [
+            'a@0.0.0',
+            'b@0.0.0',
+            'c@0.0.0'
+          ],
+          head: 'BAR'
+        },
+        npm: {
+          versions: {
+            'a': '0.0.0',
+            'b': '0.0.0',
+            'c': '0.0.0'
+          }
+        },
+        lerna: {
+          versions: {
+            'a': '0.0.1',
+            'b': '0.0.1',
+            'c': '0.0.0'
+          }
+        }
+      });
+    });
+
+    afterEach(function () {
+      io.restore();
+    });
+
+    describe('executing perform', function () {
+      beforeEach(function (done) {
+        perform({
+          io: io,
+          callback: done,
+          flags: {
+            dontPull: true,
+          },
+        });
+      });
+
+      it('does not call io.git.pull', function () {
+        expect(io.git.pull.callCount).to.equal(0);
+      });
+    })
+  });
+
+  describe('with three packages set up', function () {
     beforeEach(function () {
       var fsState = {
         'packages': {
@@ -105,7 +174,7 @@ describe('perform', function() {
         expect(fileContents[0]).to.equal('a@0.0.1');
         expect(fileContents[1]).to.equal('b@0.0.1');
       });
-      
+
       it('pushes commits', function () {
         expect(io.git.push.innerTask.called).to.equal(true);
       });
@@ -166,6 +235,5 @@ describe('perform', function() {
         expect(io.npm.publish.innerTask.callCount).to.equal(0);
       });
     });
-
   });
 });
