@@ -18,7 +18,11 @@ function pullTags (done) {
 }
 
 function pullCommits (done) {
-  this.io.git.pull()(function(err) {
+  if (this.flags.dontPull) {
+    return done();
+  }
+
+  return this.io.git.pull()(function(err) {
     done(err);
   });
 }
@@ -140,7 +144,8 @@ module.exports = function perform (config) {
     publishUpdatedPackages,
     writeReleasedPackagesFile
   ], {
-    io: config.io
+    io: config.io,
+    flags: config.flags || {},
   }),
   function (err) {
     if (err) {
