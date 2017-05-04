@@ -39,10 +39,41 @@ module.exports = {
     return trimmedPackages.split(', ');
   },
   findAffectsLine: function (commit) {
-    var message = (commit && commit.message) ? commit.message : '';
-    var affectsLine = message.split('\n').filter(function (line) {
-      return line.indexOf(affectsDelimiter) === 0;
-    })[0];
+    if (
+      !commit ||
+      !commit.message ||
+      !commit.message.length ||
+      !commit.message.match(affectsDelimiter)
+    ) {
+      return;
+    }
+
+    function reducer(affects, currentMessageLine) {
+      if (affects.done || currentMessageLine.length === 0) {
+        return affects;
+      }
+
+      if (
+        affects.message.length > 0 || currentMessageLine.indexOf(affectsDelimiter) === 0
+      ) {
+        if (currentMessageLine[currentMessageLine.length - 1] !== ',') {
+          affects.done = true;
+        }
+
+        affects.message += currentMessageLine + ' ';
+        return affects;
+      }
+
+      return affects;
+    }
+
+    var affectsLine = commit
+      .message
+      .split('\n')
+      .reduce(reducer, { message: '', done: false })
+      .message
+      .trim();
+
     return affectsLine;
-  }
+  },
 };
