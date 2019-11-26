@@ -1,7 +1,10 @@
 {
-  "name": "lerna-semantic-release-main",
+  "name": "@bertero/lerna-semantic-release",
   "description": "automated semver compliant package publishing, for lerna",
   "author": "Joshua Nelson <jonelson@atlassian.com>, Joscha Feth <jfeth@atlassian.com>",
+  "bin": {
+    "lerna-semantic-release": "packages/lerna-semantic-release/bin/lerna-semantic-release.js"
+  },
   "bugs": {
     "url": "https://github.com/atlassian/lerna-semantic-release/issues"
   },
@@ -56,6 +59,6 @@
   "release": {
     "branch": "caribou"
   },
-  "version": "0.0.0",
-  "private": true
+  "version": "1.0.1",
+  "private": false
 }
